@@ -80,8 +80,9 @@ int main(int argc, char *argv[]){
 	      client_shutdown_flag = 1;
 	    }
 	    else{
-              n = write_full(conn_fd, line, MAXLINE);
-              //printf("send %s with n = %d characters\n", line, n);
+	      char line2[103];
+	      sprintf(line2, "%03d%s", id, line);
+              n = write_full(conn_fd, line2, MAXLINE);
 	    }
 	  }
 

@@ -90,11 +90,7 @@ int main(int argc, char *argv[]){
 			FD_CLR(i, &base_rfds);
 			close(i);
 
-			for(j =0; j <= cindex; j++){
-				if (conn_fd[j] == i){
-					conn_fd[j] = -1;
-				}
-			}
+			conn_fd[j] = -1;
 		    }
 		    else{
 		        printf("read: Error occured\n");
@@ -102,14 +98,12 @@ int main(int argc, char *argv[]){
 		    }
 		  }
 		  else{
-                    //printf("line = %s with n = %d characters\n", line, n);
-                    fflush(stdout);
-                    // m = write(i, line, n);
-
 	 	    for(j =0; j < cindex; j++){
 		      if(conn_fd[j] != -1 && conn_fd[j] != i){
-                        m = write(conn_fd[j], line, n);
-                        //printf("write line = %s for m = %d characters\n", line, m);
+			char str[150];
+			sprintf(str, "\ncli-%03d says: %s", atoi(line), &line[3]);
+                        m = write(conn_fd[j], str, n);
+                        printf("write line = %s for m = %d characters\n", line, m);
                         fflush(stdout);
 		      }
 		    }
@@ -118,6 +112,4 @@ int main(int argc, char *argv[]){
 	    }
 	  }
 	}
-	close(lis_fd);
-
 }
