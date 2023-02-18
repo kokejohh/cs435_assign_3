@@ -16,6 +16,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <time.h>
 
 #define SERV_IP		"127.0.0.1"
 #define SERV_PORT 	18800
@@ -46,6 +47,9 @@ int main(int argc, char *argv[]){
 
 	serv_addr.sin_addr.s_addr = inet_addr(SERV_IP);
 
+	srand(time(NULL));
+	int id = rand()%1000;
+
         if (connect(conn_fd, (struct sockaddr *) &serv_addr, sizeof(serv_addr))<0) { 
             perror("Problem in connecting to the server");
             exit(3);
@@ -53,6 +57,7 @@ int main(int argc, char *argv[]){
 
 	FD_ZERO(&base_rfds);
 	FD_ZERO(&rfds);
+
 	FD_SET(fileno(stdin), &base_rfds);
 	FD_SET(conn_fd, &base_rfds);
 
@@ -60,7 +65,10 @@ int main(int argc, char *argv[]){
 
 	while(1){
 	  memcpy(&rfds, &base_rfds, sizeof(fd_set)); // copy it
-          if (select(fdmax+1, &rfds, NULL, NULL, NULL) == -1) {
+	  printf("cli-%03d:> ", id);
+          fflush(stdout);
+
+         if (select(fdmax+1, &rfds, NULL, NULL, NULL) == -1) {
             perror("select");
             exit(4);
           }
@@ -73,7 +81,7 @@ int main(int argc, char *argv[]){
 	    }
 	    else{
               n = write_full(conn_fd, line, MAXLINE);
-              printf("send %s with n = %d characters\n", line, n);
+              //printf("send %s with n = %d characters\n", line, n);
 	    }
 	  }
 
@@ -90,7 +98,8 @@ int main(int argc, char *argv[]){
 	      }
 	    }
 	    else{
-              printf("receive %s with m = %d characters\n", line, m);
+              //printf("\n");
+	      //printf("receive %s with m = %d characters\n", line, m);
               fputs(line, stdout);
 	    }
 	  }

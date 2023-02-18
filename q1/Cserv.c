@@ -46,7 +46,7 @@ int main(int argc, char *argv[]){
 	memset(&serv_addr, 0, sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_port = htons(SERV_PORT);
-	
+
 	serv_addr.sin_addr.s_addr = INADDR_ANY;
 
 	bind(lis_fd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)); 
@@ -106,8 +106,8 @@ int main(int argc, char *argv[]){
                     fflush(stdout);
                     // m = write(i, line, n);
 
-	 	    for(j =0; j <= cindex; j++){
-		      if(conn_fd[j] != -1){
+	 	    for(j =0; j < cindex; j++){
+		      if(conn_fd[j] != -1 && conn_fd[j] != i){
                         m = write(conn_fd[j], line, n);
                         //printf("write line = %s for m = %d characters\n", line, m);
                         fflush(stdout);
