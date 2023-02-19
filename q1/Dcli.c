@@ -38,7 +38,10 @@ int main(int argc, char *argv[]){
 	fd_set base_rfds, rfds; 
         int fdmax = 0; 
 
-        char line[MAXLINE], name[20];
+        char line[MAXLINE];
+
+	srand(time(NULL));
+	int id = (rand() % 999) + 1;
 
 	conn_fd = socket(AF_INET, SOCK_STREAM, 0); 
 
@@ -47,9 +50,6 @@ int main(int argc, char *argv[]){
 	serv_addr.sin_port = htons(SERV_PORT);
 
 	serv_addr.sin_addr.s_addr = inet_addr(SERV_IP);
-
-	srand(time(NULL));
-	int id = rand()%1000;
 
         if (connect(conn_fd, (struct sockaddr *) &serv_addr, sizeof(serv_addr))<0) { 
             perror("Problem in connecting to the server");
@@ -63,6 +63,8 @@ int main(int argc, char *argv[]){
 	FD_SET(conn_fd, &base_rfds);
 
 	fdmax = conn_fd;
+	
+	write(conn_fd, &id, sizeof(int));
 
 	while(1){
 	  memcpy(&rfds, &base_rfds, sizeof(fd_set)); // copy it
@@ -81,9 +83,7 @@ int main(int argc, char *argv[]){
 	      client_shutdown_flag = 1;
 	    }
 	    else{
-	      char line2[150];
-	      sprintf(line2, "%03d-%s", id, line);
-              n = write_full(conn_fd, line2, MAXLINE);
+              n = write_full(conn_fd, line, MAXLINE);
 	    }
 	  }
 
