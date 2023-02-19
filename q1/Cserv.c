@@ -23,7 +23,8 @@
 #define MAXLINE	100
 #define MAXCONN 254
 
-#define EMPTY -1
+#define EMPTY	-1
+#define SAME	-1
 
 #include <sys/select.h>
 
@@ -86,9 +87,21 @@ int main(int argc, char *argv[]){
 			    }
 			}
           		if (conn_id[cindex] == EMPTY) {
-            		    read(i, &conn_id[cindex], sizeof(int));
-			    printf("fd(%d) receive cli-%03d\n", conn_fd[cindex], conn_id[cindex]);
-			    continue;
+			    int tmp_id;
+			    read(i, &tmp_id, sizeof(int));
+			    for (j = 0; j < MAXCONN; j++) {
+				if (conn_id[j] == tmp_id) {
+				    tmp_id = SAME;
+				    break;
+				}
+			    }
+			    if (tmp_id == SAME) {
+				n = 0;
+			    } else {
+			    	conn_id[cindex] = tmp_id;
+			    	printf("fd(%d) receive cli-%03d\n", conn_fd[cindex], conn_id[cindex]);
+			    	continue;
+			    }
 			} else {
 	  		    n = read(i, line, MAXLINE);
 			}

@@ -64,7 +64,7 @@ int main(int argc, char *argv[]){
 
 	fdmax = conn_fd;
 	
-	write(conn_fd, &id, sizeof(int));
+	write_full(conn_fd, &id, sizeof(int));
 
 	while(1){
 	  memcpy(&rfds, &base_rfds, sizeof(fd_set)); // copy it
