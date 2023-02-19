@@ -28,14 +28,12 @@
 #include <sys/select.h>
 
 int lis_fd;
+int conn_fd[MAXCONN], conn_id[MAXCONN];
 struct sockaddr_in serv_addr;
 
-
 int main(int argc, char *argv[]){
-
-        int m, n, i, j, cindex = 0;
-        char line[MAXLINE];
-	int conn_fd[MAXCONN], conn_id[MAXCONN];
+	int n, i, j, cindex = 0;
+	char line[MAXLINE];
 
 	fd_set base_rfds; // base read fd set
 	fd_set rfds; // read fd set to be passed as a parameter of select() 
@@ -60,70 +58,64 @@ int main(int argc, char *argv[]){
 	fdmax = lis_fd;
 
 	while(1){
-	  memcpy(&rfds, &base_rfds, sizeof(fd_set));
-	  if(select(fdmax+1, &rfds, NULL, NULL, NULL) < 0){
-	    printf("select error!\n");
-	    fflush(stdout);
-	    exit(1);
-	  }
-
-	  for(i = 0; i <= fdmax; i++){
-	    if(FD_ISSET(i, &rfds)){
-		if(i == lis_fd){
-		  for (j = 0; j < MAXCONN; j++) {
-		      if (conn_fd[j] == EMPTY) {
-		          cindex = j; break;
-		      } 
-		  }
-		  if((conn_fd[cindex] = accept(lis_fd, NULL, NULL)) < 0){
-		    printf("Accept: Error occured\n");
-		    exit(1);
-		  }
-	          printf("a new connection %d are wating id ...\n", conn_fd[cindex]);
-
-		  FD_SET(conn_fd[cindex] , &base_rfds);
-		  if(conn_fd[cindex] > fdmax){
-		    fdmax = conn_fd[cindex];
-		  }
-		}
-		else{
-		  for (j = 0; j < MAXCONN; j++) {
-		      if (conn_fd[j] == i) {
-			cindex = j; break;
-		      }
-           	  }
-		  if (conn_id[cindex] == EMPTY) {
-	             n = read(i, &conn_id[cindex], sizeof(int));
-		     printf("fd(%d) receive cli-%03d\n", conn_fd[cindex], conn_id[cindex]);
-		     continue;
-		  } else {
-		     n = read(i, line, MAXLINE);
-                  }
-		  if (n <= 0){
-		    if(n == 0){
-		        printf("read: close connection %d\n", i);
-			FD_CLR(i, &base_rfds);
-			close(i);
-			conn_fd[cindex] = conn_id[cindex] = EMPTY;
-		    }
-		    else{
-		        printf("read: Error occured\n");
-		        exit(1);
-		    }
-		  }
-		  else{
-		    char str[116];
-		    sprintf(str, "\ncli-%03d says: %s", conn_id[cindex], line);
-	 	    for(j =0; j < cindex; j++){
-		      if(conn_fd[j] != -1 && conn_fd[j] != i){
-                        m = write(conn_fd[j], str, n);
-		      }
-		    }
-                    printf("%s", &str[1]);
-                    fflush(stdout);
-        	  }
-		}
+	    memcpy(&rfds, &base_rfds, sizeof(fd_set));
+	    if(select(fdmax+1, &rfds, NULL, NULL, NULL) < 0){
+	        printf("select error!\n");
+	        exit(1);
 	    }
-	  }
+	    for(i = 0; i <= fdmax; i++){
+	        if(FD_ISSET(i, &rfds)){
+		    if(i == lis_fd){
+			for (j = 0; j < MAXCONN; j++) {
+			    if (conn_fd[j] == EMPTY) {
+				cindex = j; break;
+			    } 
+			}
+			if((conn_fd[cindex] = accept(lis_fd, NULL, NULL)) < 0){
+			    printf("Accept: Error occured\n");
+			    exit(1);
+			}
+	        	printf("a new connection %d are wating id ...\n", conn_fd[cindex]);
+			FD_SET(conn_fd[cindex] , &base_rfds);
+			if(conn_fd[cindex] > fdmax){
+		  	    fdmax = conn_fd[cindex];
+			}
+	      	    } else {
+			for (j = 0; j < MAXCONN; j++) {
+		  	    if (conn_fd[j] == i) {
+	    	    		cindex = j; break;
+		  	    }
+           		}
+			if (conn_id[cindex] == EMPTY) {
+	          	    read(i, &conn_id[cindex], sizeof(int));
+		  	    printf("fd(%d) receive cli-%03d\n", conn_fd[cindex], conn_id[cindex]);
+		  	    continue;
+			} else {
+			    n = read(i, line, MAXLINE);
+                	}
+			if (n <= 0){
+		  	    if (n == 0){
+		    		printf("read: close connection %d\n", i);
+		    		FD_CLR(i, &base_rfds);
+		    		close(i);
+		    		conn_fd[cindex] = conn_id[cindex] = EMPTY;
+		  	    } else {
+		    		printf("read: Error occured\n");
+		    		exit(1);
+		  	    }
+			} else {
+		  	    char str[116];
+		  	    sprintf(str, "\ncli-%03d says: %s", conn_id[cindex], line);
+	 	  	    for(j =0; j < cindex; j++){
+		    		if(conn_fd[j] != -1 && conn_fd[j] != i){
+                    		    write(conn_fd[j], str, n);
+		    		}
+		  	    }
+                  	    printf("%s", str + 1);
+                  	    fflush(stdout);
+         		}
+	            }
+	   	}
+	    }
 	}
 }
