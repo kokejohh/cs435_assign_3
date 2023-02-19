@@ -33,11 +33,12 @@ int conn_fd;
 struct sockaddr_in serv_addr;
 
 int main(int argc, char *argv[]){
-
         int n, m;
+
 	fd_set base_rfds, rfds; 
         int fdmax = 0; 
-        char line[MAXLINE];
+
+        char line[MAXLINE], name[20];
 
 	conn_fd = socket(AF_INET, SOCK_STREAM, 0); 
 
@@ -80,8 +81,8 @@ int main(int argc, char *argv[]){
 	      client_shutdown_flag = 1;
 	    }
 	    else{
-	      char line2[103];
-	      sprintf(line2, "%03d%s", id, line);
+	      char line2[150];
+	      sprintf(line2, "%03d-%s", id, line);
               n = write_full(conn_fd, line2, MAXLINE);
 	    }
 	  }
@@ -99,8 +100,6 @@ int main(int argc, char *argv[]){
 	      }
 	    }
 	    else{
-              //printf("\n");
-	      //printf("receive %s with m = %d characters\n", line, m);
               fputs(line, stdout);
 	    }
 	  }

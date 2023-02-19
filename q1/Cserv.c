@@ -25,7 +25,6 @@
 #include <sys/select.h>
 
 int lis_fd;
-int conn_fd;
 struct sockaddr_in serv_addr;
 
 #define MAXCONN 100
@@ -59,7 +58,7 @@ int main(int argc, char *argv[]){
 	FD_SET(lis_fd, &base_rfds);
 	fdmax = lis_fd;
 
-	for(;;){
+	while(1){
 	  memcpy(&rfds, &base_rfds, sizeof(fd_set));
 	  if(select(fdmax+1, &rfds, NULL, NULL, NULL) < 0){
 	    printf("select error!\n");
@@ -98,15 +97,15 @@ int main(int argc, char *argv[]){
 		    }
 		  }
 		  else{
+		    char str[150];
+		    sprintf(str, "\ncli-%03d says: %s", atoi(line), &line[4]);
 	 	    for(j =0; j < cindex; j++){
 		      if(conn_fd[j] != -1 && conn_fd[j] != i){
-			char str[150];
-			sprintf(str, "\ncli-%03d says: %s", atoi(line), &line[3]);
                         m = write(conn_fd[j], str, n);
-                        printf("write line = %s for m = %d characters\n", line, m);
-                        fflush(stdout);
 		      }
 		    }
+                    printf("%s", &str[1]);
+                    fflush(stdout);
         	  }
 		}
 	    }
