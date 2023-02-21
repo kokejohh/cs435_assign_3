@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 typedef struct hnode {
 	int client;
@@ -18,7 +17,8 @@ void addAtFront(int client, int length, char *line)
 
 	tmp->client = client;
 	tmp->length = length;
-	tmp->line = strdup(line);
+	tmp->line = (char *)malloc((length + 1) * sizeof(char));
+	memcpy(tmp->line, line, length);
 	if (tail == NULL)
 	{
 		tmp->next = tmp;
@@ -37,7 +37,8 @@ void addAtLast(int client, int length, char *line)
 	
 	tmp->client = client;
 	tmp->length = length;
-	tmp->line = strdup(line);
+	tmp->line = (char *)malloc((length + 1) * sizeof(char));
+	memcpy(tmp->line, line, length);
 	if (tail == NULL)
 	{
 		tmp->next = tmp;
@@ -58,6 +59,7 @@ void deleteFirst()
 	{
 		hnode *tmp = tail->next;
 		head = tail->next = tmp->next;
+		free(tmp->line);
 		free(tmp);
 	}
 }
@@ -72,6 +74,7 @@ void deleteLast()
 			tmp = tmp->next;
 		head = tmp->next = tail->next;
 		tail = tmp->next;
+		free(tmp->line);
 		free(tmp);	
 	}
 }
@@ -86,12 +89,8 @@ void viewList()
 		do
 		{
 			printf("cli-%03d(%d) says: %s", tmp->client, tmp->length, tmp->line);
+			fflush(stdout);
 			tmp = tmp->next;
 		} while (tmp != tail->next);
 	}
-}
-
-void test()
-{
-	printf("test\n");
 }

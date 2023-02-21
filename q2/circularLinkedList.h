@@ -6,6 +6,5 @@ void addAtLast(int client, int length, char *line);
 void deleteFirst();
 void deleteLast();
 void viewList();
-void test();
 
 #endif
