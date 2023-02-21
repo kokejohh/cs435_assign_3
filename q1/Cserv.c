@@ -59,12 +59,12 @@ int main(int argc, char *argv[]){
 
 	while(1){
     	    memcpy(&rfds, &base_rfds, sizeof(fd_set)); //copy base_rfds to rfds
-	    if (select(fdmax+1, &rfds, NULL, NULL, NULL) < 0) { //select block until somthing happend with fd
+	    if (select(fdmax+1, &rfds, NULL, NULL, NULL) < 0) { //select block until something happend with fd
 		printf("select error!\n");
 		exit(1);
 	    }
 	    for (i = 0; i <= fdmax; i++) {
-		if (FD_ISSET(i, &rfds)) { //set rfds = i
+		if (FD_ISSET(i, &rfds)) { //check if there is i in set of rfds
 		    if (i == lis_fd) { //if i is a listening_fd
 			for (j = 0; j < MAXCONN; j++) {
 			    if (conn_fd[j] == EMPTY) { //if conn_fd[j] is not connected
@@ -86,12 +86,12 @@ int main(int argc, char *argv[]){
 				cindex = j; break;
 			    }
 			}
-          		if (conn_id[cindex] == EMPTY) { //if conn_id[cindex] is not connected
+          		if (conn_id[cindex] == EMPTY) { //if client don't have ID, It will assign ID to client
 			    int tmp_id;
 			    read(i, &tmp_id, sizeof(int)); //read message(id) from client and copy to tmp_id
 			    for (j = 0; j < MAXCONN; j++) {
 				if (conn_id[j] == tmp_id) {
-				    tmp_id = SAME; //let tmp_id = SAME (show that ID from client is a duplicate ID and close connection)
+				    tmp_id = SAME; //let tmp_id = SAME ("SAME" mean that ID from client is a duplicate ID and close connection)
 				    break; //end of loop
 				}
 			    }
@@ -124,7 +124,7 @@ int main(int argc, char *argv[]){
 				}
 			    }
             		    printf("%s", str + 1);
-            		    fflush(stdout); //clera buffer
+            		    fflush(stdout); //clear buffer
          		}
 		    }
 		}
