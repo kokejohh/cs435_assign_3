@@ -125,13 +125,13 @@ int main(int argc, char *argv[]){
 				    write(conn_fd[j], str, n); //send message to client
 				}
 			    }
-			    addAtLast(conn_id[cindex], strlen(line), line);
+			    addAtLast(conn_id[cindex], strlen(line), line); //add node in history
 			    if (numOfHis < MAXHISTORY) {
 				numOfHis++;
 			    } else {
-				deleteFirst();
-			    }	
-			    viewList();
+				deleteFirst(); //delete node in history
+			    }
+			    viewList(); // show history
          		}
 		    }
 		}
