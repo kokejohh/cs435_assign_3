@@ -118,8 +118,8 @@ int main(int argc, char *argv[]){
 		    	} else {
 		            char str[116];
 		 	    sprintf(str, "\ncli-%03d says: %s", conn_id[cindex], line);
-			    for(j = 0; j < cindex; j++) {
-				if (conn_fd[j] != -1 && conn_fd[j] != i) {
+			    for(j = 0; j < MAXCONN; j++) {
+				if (conn_fd[j] != EMPTY && conn_fd[j] != i) {
 				    write(conn_fd[j], str, n); //send message to client
 				}
 			    }
