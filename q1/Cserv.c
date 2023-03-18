@@ -75,7 +75,7 @@ int main(int argc, char *argv[]){
 				printf("Accept: Error occured\n"); //show error message
 				exit(1);
 			}
-          		printf("a new connection %d are wating id ...\n", conn_fd[cindex]); //if it connected, show message a new connection
+          		printf("a new connection %d are waiting id ...\n", conn_fd[cindex]); //if it connected, show message a new connection
           		FD_SET(conn_fd[cindex] , &base_rfds); //add value of conn_fd[cindex] into base_rfds
           		if(conn_fd[cindex] > fdmax){
 		       	    fdmax = conn_fd[cindex];
